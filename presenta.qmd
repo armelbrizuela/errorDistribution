@@ -1,0 +1,248 @@
+---
+title: "Modelos del error y distribuciones muestrales"
+format: 
+  html:
+    embed-resources: true
+editor: visual
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r}
+#| eval: false
+install.packages("readr")
+```
+
+```{r}
+library(readr)
+library(dplyr)
+```
+
+Nuestro modelo simple es
+
+$$
+DATOS = MODELO + ERROR
+$$
+
+$$
+Y_i = \beta_0 + \varepsilon_i
+$$
+
+Este modelo nos dice que, si no fuera por las perturbaciones aleatorias representadas por $\varepsilon_i$, todas las observaciones $Y_i$ serían exactamente iguales a $\beta_0$.
+
+Las desviaciones de las $Y_i$ con respecto al valor verdadero se deben a diversos factores $X_1, X_2, ... X_n$.
+
+En este modelo de un parámetro, todos estos factores se consideran $ERROR$. En un modelo con más parámetros, lo que hacemos es sacar esos factores de $ERROR$ para "pasarlos" a $MODELO$ como predictores $X_1, X_2, ... X_n$.
+
+# Distribución de los errores
+
+Para tener una mejor comprensión del componente $ERROR$, vamos a generar una población de errores.
+
+```{r}
+epsilon_i <- c(
+  -11, 6, 32, 15, 20, 11, -19, 8, 1, 7, 12, -5, 29, -14, -4, 0,
+  -15, 11, -31, 12, 0, -4, -11, -22, 7, -10, -4, -2, 14, 0, 4, 
+  7, -8, -13, -15, 17, 2, -14, -5, 10, -5, -2, 3, 4, 22, -17, 12, 
+  -26, -1, 9, -6, -22, -7, -25, -23, -8, -20, 4, 29, -10, -12, 
+  13, 3, 28, 10, 5, 10, -7, 1, 2, 1, -2, -3, -4, 6, 17, 31, 24,
+  19, -5, 4, -23, 10, -26, -15, 20, -11, -24, 3, 2, -6, 25, -9,
+  -5, -5, -28, 5, -19, 35, -24)
+```
+
+Ahora vamos a genear una muestra aleatoria simple de esta población.
+
+```{r}
+e_i <- sample(x = epsilon_i, size = 20, replace = FALSE)
+```
+
+Para este ejemplo, supongamos que $\beta_0 = 50$.
+
+```{r}
+Y_i = 50 + e_i
+```
+
+Dado que el muestreo es aleatorio, cada vez que ejecutemos las anteriores dos celdas, obtendremos errores $e_i$ diferentes y, por ende, observaciones $Y_i$ diferentes.
+
+Veamos las posibles estimaciones de $\beta_0$ que se obtienen con los datos muestrales.
+
+```{r}
+mean(Y_i)
+median(Y_i)
+```
+
+Dado que `Y_i` es una muestra, no es esperable que la media ni la mediana estimadas sean exactamente iguales a $\beta_0$. Sin embargo, si la media y la mediana son estimadores adecuados de $\beta_0$, esperaríamos que **en promedio** se acerquen a $\beta_0$.
+
+```{r}
+medias <- vector(mode = "numeric")
+medianas <- vector(mode = "numeric")
+
+for (i in 1:1000) {
+  e_i <- sample(x = epsilon_i, size = 20, replace = TRUE)
+  Y_i = 50 + e_i
+  medias[i] <- mean(Y_i)
+  medianas[i] <- median(Y_i)
+}
+```
+
+```{r}
+mean(medias)
+mean(medianas)
+```
+
+Veamos las **distribuciones muestrales** de las medias y de las medianas.
+
+```{r}
+plot(
+  density(medias, adjust=3),
+  main="", 
+  xlab="", 
+  ylab="",
+  xlim=c(35, 70))
+
+lines(
+  density(medianas, adjust=3), 
+  type="l", 
+  lty=2)
+```
+
+# Propiedades de los estimadores
+
+Las distribuciones muestrales de un estimador permiten evaluar si estos cumplen con tres propiedades deseables:
+
+1.  No-sesgo (*unbiasedness*): El centro de la distribución muestral es igual al valor verdadero del parámetro de interés.
+2.  Eficiencia (*efficiency*): La mayoría de valores de la distribución muestral se acerca al valor verdadero del parámetro.
+3.  Consistencia (*consistency*): La distribución muestral se estrecha (se reduce la varianza) conforme aumenta el tamaño de las muestras.
+
+# Distribución normal del error
+
+En el gráfico vemos que la media es más eficiente que la mediana. Por lo tanto, deberíamos escoger la suma de errores cuadráticos (SSE) como índice agregado de error, ya que este es el que se asocia a la media como estimador.
+
+Sin embargo, la mayor eficiencia de la media depende de la distribución de `epsilon_i`. Específicamente, la media es más eficiente para estimar $\beta_0$ si la distribución de `epsilon_i` es normal.
+
+```{r}
+plot(density(epsilon_i, adjust = 3), main="", xlab="", ylab="")
+```
+
+Tanto la regresión lineal (simple o múltiple) o el ANOVA generalmente asumen la distribución normal de los errores $\varepsilon_i$.
+
+Existen varias razones para preferir la distribución normal sobre otras posibles distribuciones. Una de gran importancia es la que se basa en el **Teorema del límite central**.
+
+El Teorema del límite central muestra que la distribución de las sumas o las medias de un conjunto de valores se aproximará a una distribución normal sin importar cuál sea la distribución original de los valores individuales. Por lo tanto, si suponemos que cada error $\varepsilon_i$ es la suma de varios errores individuales, entonces es razonable esperar que la distribución de los errores se aproxime a una distribución normal.
+
+```{r}
+N <- 1e6
+X <- runif(N, -0.5, 0.5)
+# X <- rchisq(N, 1)
+hist(X, main = "Distribución uniforme")
+```
+
+```{r}
+medias <- vector(mode = "numeric")
+n <- 1
+
+for (i in 1:10000) medias[i] <- mean(sample(x = X, size = n, replace = TRUE))
+
+hist(medias, main = "Distribución muestral de la media")
+```
+
+El Teorema del límite central también muestra que cuanto mayor sea el número de valores en la suma o promedio, mejor será la aproximación a una distribución normal.
+
+Debido a lo anterior, muchos software de análisis estadístico implementan procedimientos basados en el supuesto de normalidad de los errores.
+
+Asumir la normalidad de los errores nos obliga a verificar en todos los análisis que realizaremos si este supuesto se cumple. Para ello, será necesario graficar los residuos con funciones como `residuals()` u otras similares.
+
+# Otros supuestos sobre los errores
+
+## Independientes
+
+El valor de cada $\varepsilon_i$ no debe estar relacionado con el valor de ningún otro $\varepsilon_i$.
+
+Este supuesto se tiende a incumplir con las series temporales, las mediciones repetidas provenientes de diseños intra-sujeto y los registros generados por díadas (p. ej., esposo-esposa).
+
+Para este tipo de datos será necesario introducir ciertas modificaciones que permitan incluir de manera explícita la posible dependencia de los errores.
+
+## Distribuidos idénticamente
+
+Todos los errores $\varepsilon_i$ siguen la misma distribución.
+
+Este supuesto se podría inclumplir en el caso de experimentos con dos o más grupos, de modo que cada grupo tenga una varianza diferente.
+
+Cuando se incumple este supuesto, será necesario incluir modificaciones que reduzcan la heterogeneidad de las varianzas.
+
+## No sesgados
+
+La distribución de los errores $\varepsilon_i$ se centra en 0.
+
+Si existen factores que de manera sistemática (no aleatoria) introduzcan errores en las observaciones, las estimaciones de los parámetros también serán sesgadas.
+
+Para cumplir con este supuesto es necesario que la recolección de los datos sea adecuada. Esto implica evaluar la calidad de los instrumentos de medición y del diseño del estudio antes de recoger los datos.
+
+# Apéndice
+
+## Especificación formal de la distribución normal
+
+La distribución normal se suele expresar formalmente con la siguiente fórmula:
+
+$$
+f(x) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}
+$$
+
+En R, la función `dnorm()` implementa dicha fórmula. Los parámetros `dnorm()` son `mean` y `sd`, los cuales por *default* están fijados en 0 y 1, respectivamente. A esta distribución se le denomina **distribución normal estándar**.
+
+```{r}
+X <- seq(from = -3, to = 3, by = 0.01)
+Y <- dnorm(X)
+```
+
+```{r}
+plot(X, Y, type = "l")
+```
+
+Si las variables que nos interesan muestran una distribución (aproximadamente) normal, podemos contestar preguntas sobre qué tan atípicos son ciertos valores de dichas variables.
+
+En muchas ocasiones, se transforma la métrica de la variable de interés para que tenga una media de 0 y una desviación estándar de 1. Esto permite utilizar la distribución normal estándar como referencia. A las puntuaciones transformadas de esta manera se les conoce como **puntuaciones z**.
+
+Veamos un ejemplo con un conjunto de datos recopilados mediante un intrumento para medir el nivel de extraversión de las personas.
+
+```{r}
+extraversion <- read_delim("extraversion.csv", delim = ";")
+extraversion$TOTAL <- rowMeans(extraversion)
+extraversion$ZTOTAL <- scale(extraversion$TOTAL)
+```
+
+```{r}
+plot(density(extraversion$ZTOTAL), main="", xlab="", y="")
+```
+
+Vamos a asumir que la extraversión se distribuye normalmente. Bajo este supuesto, vamos a determinar qué tan extravertida es la siguiente persona.
+
+```{r}
+score <- mean(c(2, 4, 1, 5, 1, 3, 1, 5, 1, 5))
+```
+
+```{r}
+z_score <- (score - mean(extraversion$TOTAL))/sd(extraversion$TOTAL)
+```
+
+```{r}
+plot(density(extraversion$ZTOTAL), main="", xlab="", y="")
+abline(v = z_score)
+```
+
+¿Cuál es la probabilidad de observar un nivel de extraversión igual o más elevado que este?
+
+```{r}
+integrate(dnorm, mean = 0, sd = 1, lower = z_score, upper = Inf)$value
+```
+
+¿Cuál es la probabilidad de observar niveles de extroversión que estén a 1 desviación estándar de la media?
+
+```{r}
+integrate(dnorm, mean = 0, sd = 1, lower = -1, upper = 1)$value
+```
+
+¿Cuál es la probabilidad de observar un nivel "extremo" de extraversión? Podríamos usar -1.959964 como un nivel extremadamente bajo de extraversión y 1.959964 como un nivel extremadamente alto de extraversión.
+
+```{r}
+1 - integrate(dnorm, mean = 0, sd = 1, lower = -1.959964, upper = 1.959964)$value
+```

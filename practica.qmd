@@ -1,0 +1,105 @@
+---
+title: "Práctica de Error y estimaciones de parámetros"
+format: 
+  html:
+    embed-resources: true
+editor: visual
+editor_options: 
+  chunk_output_type: inline
+---
+
+Estos paquetes deben estar instalados. La mayoría posiblemente fueron instalados, pero siempre es conveniente revisar. Por ejemplo, ¿el paquete **psych** está instalado?
+
+```{r}
+#| eval: false
+install.packages("ggplot2")
+install.packages("readr")
+install.packages("dplyr")
+install.packages("psych")
+```
+
+Cargue los siguientes paquetes antes de realizar los análisis: **ggplot2**, **stringr**, **readr**, **dplyr** y **psych**.
+
+```{r}
+
+
+```
+
+Lea los datos del archivo *happiness.csv* con la función `read_delim()`. Las columnas del archivo están separadas por punto y coma (;). Guarde los datos en un objeto llamado `felicidad`.
+
+```{r}
+
+
+```
+
+Con la función `glimpse()` revise que la importación se haya realizado correctamente. En el objeto `felicidad` debe haber 9 columnas y 153 filas. Ocho columnas deben ser tipo `double` y una, `Country_region` debe ser de tipo `character`.
+
+```{r}
+
+
+```
+
+Los nombres de los países en la columna `Country_region` tienen espacios en blanco al inicio del nombre. Elimine estos espacios en blanco con la función `str_trim()`.
+
+```{r}
+felicidad <- felicidad |>
+  mutate(Country_region = str_trim(      ))
+```
+
+Muestre algunos estadísticos descriptivos de las variables numéricas de `felicidad` con la función `describe()`. Revise si existen valores perdidos (`NA`).
+
+```{r}
+ |>
+  select(where(is.numeric)) |>
+  describe()
+```
+
+Estime dos modelos, uno Compacto y otro Aumentado. Para ambos modelos seleccione la misma variable de respuesta y al modelo Aumentado incorpore un único predictor. En ambos modelos debe incluirse el intercepto. Puede utilizar cualquiera de las siguientes variables: `GDP_per_capita`, `Social_support`, `Healthy_life_expectancy`, `Freedom_life_choices`, `Generosity` o `Perceptions_corruption`.
+
+```{r}
+modeloC <- lm( ~ , data = )
+modeloA <- lm( ~ , data = )
+```
+
+Muestre los SSE de ambos modelos.
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+Mediante la función `sigma()` muestre los MSE de ambos modelos.
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+Mediante la función `sigma()` muestre los RMSE de ambos modelos.
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+Se muestra el coeficiente de variación de los datos. ¿Es necesario calcular un coeficiente de variación para cada modelo?
+
+```{r}
+
+
+```
