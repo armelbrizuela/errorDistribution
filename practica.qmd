@@ -1,105 +1,123 @@
 ---
-title: "Práctica de Error y estimaciones de parámetros"
+title: "Práctica de Error y distribución muestral"
 format: 
   html:
     embed-resources: true
 editor: visual
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
-Estos paquetes deben estar instalados. La mayoría posiblemente fueron instalados, pero siempre es conveniente revisar. Por ejemplo, ¿el paquete **psych** está instalado?
+Estos paquetes deben estar instalados.
 
 ```{r}
 #| eval: false
-install.packages("ggplot2")
-install.packages("readr")
+install.packages("haven")
 install.packages("dplyr")
-install.packages("psych")
+install.packages("tidyr")
 ```
 
-Cargue los siguientes paquetes antes de realizar los análisis: **ggplot2**, **stringr**, **readr**, **dplyr** y **psych**.
+Con la función `library()`, active los siguientes paquetes: **haven**, **dplyr** y **tidyr**.
 
 ```{r}
 
-
 ```
 
-Lea los datos del archivo *happiness.csv* con la función `read_delim()`. Las columnas del archivo están separadas por punto y coma (;). Guarde los datos en un objeto llamado `felicidad`.
+Lea el archivo de datos **sadism.sav** con la función `read_sav()` y guarde los datos en un objeto denominado `sadism`. Entre comillas y dentro de los paréntesis de `read_sav()`, escriba el nombre (*sadism*) y extensión (*.sav*) del archivo.
 
 ```{r}
 
-
 ```
 
-Con la función `glimpse()` revise que la importación se haya realizado correctamente. En el objeto `felicidad` debe haber 9 columnas y 153 filas. Ocho columnas deben ser tipo `double` y una, `Country_region` debe ser de tipo `character`.
+Con la función `glimpse()` verifique que todas las columnas dentro del objeto `sadism` sean `dbl` (*double*).
 
 ```{r}
 
-
 ```
 
-Los nombres de los países en la columna `Country_region` tienen espacios en blanco al inicio del nombre. Elimine estos espacios en blanco con la función `str_trim()`.
-
-```{r}
-felicidad <- felicidad |>
-  mutate(Country_region = str_trim(      ))
-```
-
-Muestre algunos estadísticos descriptivos de las variables numéricas de `felicidad` con la función `describe()`. Revise si existen valores perdidos (`NA`).
-
-```{r}
- |>
-  select(where(is.numeric)) |>
-  describe()
-```
-
-Estime dos modelos, uno Compacto y otro Aumentado. Para ambos modelos seleccione la misma variable de respuesta y al modelo Aumentado incorpore un único predictor. En ambos modelos debe incluirse el intercepto. Puede utilizar cualquiera de las siguientes variables: `GDP_per_capita`, `Social_support`, `Healthy_life_expectancy`, `Freedom_life_choices`, `Generosity` o `Perceptions_corruption`.
-
-```{r}
-modeloC <- lm( ~ , data = )
-modeloA <- lm( ~ , data = )
-```
-
-Muestre los SSE de ambos modelos.
+Las columnas de los archivos .sav generalmente incluyen metadatos sobre las columnas llamados *labels* (`lbl`). Es preferible eliminar esta información, ya que en ocasiones genera conflictos con algunos paquetes en R. Para ello, utilice la función `zap_labels()`.
 
 ```{r}
 
-
 ```
+
+Verifique que el cambio se haya realizado mediante la función `glimpse()`.
 
 ```{r}
 
-
 ```
 
-Mediante la función `sigma()` muestre los MSE de ambos modelos.
+Con la función `select()` seleccione las columnas `sr1`, `sr2`, `sr3`, ... hasta `sr34`. Guarde las columnas seleccionadas en un objeto denominado `items`.
+
+```{r}
+items <- select( , sr1:sr34)
+```
+
+Con la función `drop_na()` elimine todas las filas con al menos un dato perdido (`NA`) en `items`.
+
+```{r}
+items <- drop_na( )
+```
+
+Genere las puntuaciones totales para los constructos *boredom* (sr1 - sr8), *sadism* (sr9 - sr24) y *bullying* (sr25 - sr34) con la función `transmute()`. Guarde las 3 columnas generadas en un objeto denominado `totals`.
+
+```{r}
+totals <- transmute(items,
+                boredom = rowSums(across(sr1:sr8)),
+                sadism = ,
+                bullying = )
+```
+
+Estime un modelo C(ompacto) con la función `lm()`, el cual solo incluye un parámetro. La variable de respuesta es `sadism`.
+
+```{r}
+modeloC <- lm()
+```
+
+Estime un modelo A(umentado) con la función `lm()`, el cual incluye tanto el intercepto como el predictor `boredom`.
+
+```{r}
+modeloA <- lm()
+```
+
+Calcule el PRE (*Proportional Reduction Error*) resultante al incluir *boredom* en el modelo A. Para calcular el error generado por los modelos C y A debe utilizar `residuals()^2`.
+
+$$
+\text{PRE} = \frac{\text{ERROR(C)} - \text{ERROR(A)}}{\text{ERROR(C)}} = 1 - \frac{\text{ERROR(A)}}{\text{ERROR(C)}}
+$$
+
+```{r}
+PRE <- 1 - sum()/sum()
+PRE
+```
+
+Evalúe si los errores del modelo A son (aproximadamente) normales y si están centrados en 0. Para ello, utilice las funciones `hist()` y `residuals()`.
 
 ```{r}
 
-
 ```
+
+Estime un nuevo modelo A con dos predictores: `boredom` y `bullying`.
+
+```{r}
+modeloA <- lm()
+```
+
+Calcule nuevamente el PRE para comparar los errores del modelo C con el nuevo modelo A.
+
+```{r}
+PRE <- 1 - sum()/sum()
+PRE
+```
+
+Evalúe si los errores del nuevo modelo A son (aproximadamente) normales y si están centrados en 0.
 
 ```{r}
 
-
 ```
 
-Mediante la función `sigma()` muestre los RMSE de ambos modelos.
+Finalmente, muestre los coeficientes $\beta_0$, $\beta_1$ y $\beta_2$ del nuevo modelo A con la función `coef()`.
 
 ```{r}
-
-
-```
-
-```{r}
-
-
-```
-
-Se muestra el coeficiente de variación de los datos. ¿Es necesario calcular un coeficiente de variación para cada modelo?
-
-```{r}
-
 
 ```

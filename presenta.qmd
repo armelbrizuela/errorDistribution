@@ -1,11 +1,11 @@
 ---
-title: "Modelos del error y distribuciones muestrales"
+title: "Error y distribuciones muestral"
 format: 
   html:
     embed-resources: true
 editor: visual
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{r}
@@ -95,7 +95,7 @@ Veamos las **distribuciones muestrales** de las medias y de las medianas.
 plot(
   density(medias, adjust=3),
   main="", 
-  xlab="", 
+  xlab="",
   ylab="",
   xlim=c(35, 70))
 

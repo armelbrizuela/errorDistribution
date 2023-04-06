@@ -14,5 +14,3 @@ LaTeX: pdfLaTeX
 
 QuitChildProcessesOnExit: Yes
 DisableExecuteRprofile: Yes
-
-SpellingDictionary: es_ES
