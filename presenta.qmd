@@ -92,17 +92,8 @@ mean(medianas)
 Veamos las **distribuciones muestrales** de las medias y de las medianas.
 
 ```{r}
-plot(
-  density(medias, adjust=3),
-  main="", 
-  xlab="",
-  ylab="",
-  xlim=c(35, 70))
-
-lines(
-  density(medianas, adjust=3), 
-  type="l", 
-  lty=2)
+hist(medias, col = "black", main = "", xlab = "", xlim = c(35, 70))
+hist(medianas, col = rgb(1, 1, 1, 0.5), add = TRUE)
 ```
 
 # Propiedades de los estimadores
@@ -120,7 +111,7 @@ En el gráfico vemos que la media es más eficiente que la mediana. Por lo tanto
 Sin embargo, la mayor eficiencia de la media depende de la distribución de `epsilon_i`. Específicamente, la media es más eficiente para estimar $\beta_0$ si la distribución de `epsilon_i` es normal.
 
 ```{r}
-plot(density(epsilon_i, adjust = 3), main="", xlab="", ylab="")
+hist(epsilon_i)
 ```
 
 Tanto la regresión lineal (simple o múltiple) o el ANOVA generalmente asumen la distribución normal de los errores $\varepsilon_i$.
@@ -211,7 +202,7 @@ extraversion$ZTOTAL <- scale(extraversion$TOTAL)
 ```
 
 ```{r}
-plot(density(extraversion$ZTOTAL), main="", xlab="", y="")
+hist(extraversion$ZTOTAL)
 ```
 
 Vamos a asumir que la extraversión se distribuye normalmente. Bajo este supuesto, vamos a determinar qué tan extravertida es la siguiente persona.
@@ -225,8 +216,8 @@ z_score <- (score - mean(extraversion$TOTAL))/sd(extraversion$TOTAL)
 ```
 
 ```{r}
-plot(density(extraversion$ZTOTAL), main="", xlab="", y="")
-abline(v = z_score)
+hist(extraversion$ZTOTAL, col = "yellow")
+abline(v = z_score, col = "blue", lwd = 2, lty = "dotted")
 ```
 
 ¿Cuál es la probabilidad de observar un nivel de extraversión igual o más elevado que este?
