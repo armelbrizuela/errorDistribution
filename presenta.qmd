@@ -52,7 +52,7 @@ epsilon_i <- c(
 Ahora vamos a genear una muestra aleatoria simple de esta población.
 
 ```{r}
-e_i <- sample(x = epsilon_i, size = 20, replace = FALSE)
+e_i <- sample(x = epsilon_i, size = 20, replace = TRUE)
 ```
 
 Para este ejemplo, supongamos que $\beta_0 = 50$.
@@ -178,15 +178,24 @@ $$
 f(x) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}
 $$
 
-En R, la función `dnorm()` implementa dicha fórmula. Los parámetros `dnorm()` son `mean` y `sd`, los cuales por *default* están fijados en 0 y 1, respectivamente. A esta distribución se le denomina **distribución normal estándar**.
+En R, la función `dnorm()` implementa dicha fórmula. Los parámetros de `dnorm()` son `mean` y `sd`, los cuales por *default* están fijados en 0 y 1, respectivamente. A esta distribución se le denomina **distribución normal estándar**.
 
 ```{r}
-X <- seq(from = -3, to = 3, by = 0.01)
-Y <- dnorm(X)
+curve(dnorm(x, mean=0, sd=1), from=-5, to=5)
 ```
 
+El parámetro `mean` permite modificar la localización de la distribución.
+
 ```{r}
-plot(X, Y, type = "l")
+curve(dnorm(x, mean = 0, sd = 1), from=-5, to=5, col="blue")
+curve(dnorm(x, mean = 1, sd = 1), col="red", add=TRUE)
+```
+
+El parámetro `sd` permite modificar la variabilidad o dispersión de la distribución.
+
+```{r}
+curve(dnorm(x, mean = 0, sd = 1), from=-5, to=5, col="blue")
+curve(dnorm(x, mean = 0, sd = 1.5), col="red", add=TRUE)
 ```
 
 Si las variables que nos interesan muestran una distribución (aproximadamente) normal, podemos contestar preguntas sobre qué tan atípicos son ciertos valores de dichas variables.
@@ -236,4 +245,16 @@ integrate(dnorm, mean = 0, sd = 1, lower = -1, upper = 1)$value
 
 ```{r}
 1 - integrate(dnorm, mean = 0, sd = 1, lower = -1.959964, upper = 1.959964)$value
+```
+
+También es posible crear tablas como la que aparece en la página 32 del libro, la cual muestra las áreas bajo la curva normal asociadas a diferentes puntuaciones Z. A continuación se utiliza la función `pnorm()`, la cual calcula el área bajo la curva normal estándar desde `-Inf` hasta la puntuación Z de interés.
+
+```{r}
+Z <- seq(from = -3, to = 3, by = 0.1)
+probability <- pnorm(Z)
+cumulativeProbabilities <- round(cbind(Z, areas), 3)
+```
+
+```{r}
+plot(Z, probability, type="l")
 ```
