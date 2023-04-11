@@ -201,11 +201,25 @@ Si las variables que nos interesan muestran una distribución (aproximadamente) 
 
 En muchas ocasiones, se transforma la métrica de la variable de interés para que tenga una media de 0 y una desviación estándar de 1. Esto permite utilizar la distribución normal estándar como referencia. A las puntuaciones transformadas de esta manera se les conoce como **puntuaciones z**.
 
+$$
+Z=\frac{x-\mu}{\sigma}
+$$
+
 Veamos un ejemplo con un conjunto de datos recopilados mediante un intrumento para medir el nivel de extraversión de las personas.
 
 ```{r}
 extraversion <- read_delim("extraversion.csv", delim = ";")
+```
+
+Se calcula la puntuación promedio de cada persona.
+
+```{r}
 extraversion$TOTAL <- rowMeans(extraversion)
+```
+
+Se calculan las puntuaciones Z de cada persona.
+
+```{r}
 extraversion$ZTOTAL <- scale(extraversion$TOTAL)
 ```
 
@@ -241,6 +255,11 @@ integrate(dnorm, mean = 0, sd = 1, lower = -1, upper = 1)$value
 ```
 
 ¿Cuál es la probabilidad de observar un nivel "extremo" de extraversión? Podríamos usar -1.959964 como un nivel extremadamente bajo de extraversión y 1.959964 como un nivel extremadamente alto de extraversión.
+
+```{r}
+hist(extraversion$ZTOTAL, col = "yellow")
+abline(v = c(-1.959964, 1.959964), col = "blue", lwd = 2, lty = "dotted")
+```
 
 ```{r}
 1 - integrate(dnorm, mean = 0, sd = 1, lower = -1.959964, upper = 1.959964)$value
