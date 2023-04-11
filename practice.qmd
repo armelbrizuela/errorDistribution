@@ -20,43 +20,45 @@ install.packages("tidyr")
 Con la función `library()`, active los siguientes paquetes: **haven**, **dplyr** y **tidyr**.
 
 ```{r}
-
+library(haven)
+library(dplyr)
+library(tidyr)
 ```
 
 Lea el archivo de datos **sadism.sav** con la función `read_sav()` y guarde los datos en un objeto denominado `sadism`. Entre comillas y dentro de los paréntesis de `read_sav()`, escriba el nombre (*sadism*) y extensión (*.sav*) del archivo.
 
 ```{r}
-
+sadism <- read_sav("sadism.sav")
 ```
 
 Con la función `glimpse()` verifique que todas las columnas dentro del objeto `sadism` sean `dbl` (*double*).
 
 ```{r}
-
+glimpse(sadism)
 ```
 
 Las columnas de los archivos .sav generalmente incluyen metadatos sobre las columnas llamados *labels* (`lbl`). Es preferible eliminar esta información, ya que en ocasiones genera conflictos con algunos paquetes en R. Para ello, utilice la función `zap_labels()`.
 
 ```{r}
-
+sadism <- zap_labels(sadism)
 ```
 
 Verifique que el cambio se haya realizado mediante la función `glimpse()`.
 
 ```{r}
-
+glimpse(sadism)
 ```
 
 Con la función `select()` seleccione las columnas `sr1`, `sr2`, `sr3`, ... hasta `sr34`. Guarde las columnas seleccionadas en un objeto denominado `items`.
 
 ```{r}
-items <- select( , sr1:sr34)
+items <- select(sadism, sr1:sr34)
 ```
 
 Con la función `drop_na()` elimine todas las filas con al menos un dato perdido (`NA`) en `items`.
 
 ```{r}
-items <- drop_na( )
+items <- drop_na(items)
 ```
 
 Genere las puntuaciones totales para los constructos *boredom* (sr1 - sr8), *sadism* (sr9 - sr24) y *bullying* (sr25 - sr34) con la función `transmute()`. Guarde las 3 columnas generadas en un objeto denominado `totals`.
@@ -64,60 +66,60 @@ Genere las puntuaciones totales para los constructos *boredom* (sr1 - sr8), *sad
 ```{r}
 totals <- transmute(items,
                 boredom = rowSums(across(sr1:sr8)),
-                sadism = ,
-                bullying = )
+                sadism = rowSums(across(sr9:sr24)),
+                bullying = rowSums(across(sr25:sr34)))
 ```
 
 Estime un modelo C(ompacto) con la función `lm()`, el cual solo incluye un parámetro. La variable de respuesta es `sadism`.
 
 ```{r}
-modeloC <- lm()
+modeloC <- lm(sadism ~ 1, data = totals)
 ```
 
 Estime un modelo A(umentado) con la función `lm()`, el cual incluye tanto el intercepto como el predictor `boredom`.
 
 ```{r}
-modeloA <- lm()
+modeloA <- lm(sadism ~ 1 + boredom, data = totals)
 ```
 
-Calcule el PRE (*Proportional Reduction Error*) resultante al incluir *boredom* en el modelo A. Para calcular el error generado por los modelos C y A debe utilizar `residuals()^2`.
+Calcule el PRE (*Proportional Reduction Error*) resultante al incluir *boredom* en el modelo A. Para calcular el error generado por los modelos C y A debe utilizar `sum(residuals()^2)`.
 
 $$
 \text{PRE} = \frac{\text{ERROR(C)} - \text{ERROR(A)}}{\text{ERROR(C)}} = 1 - \frac{\text{ERROR(A)}}{\text{ERROR(C)}}
 $$
 
 ```{r}
-PRE <- 1 - sum()/sum()
+PRE <- 1 - sum(residuals(modeloA)^2)/sum(residuals(modeloC)^2)
 PRE
 ```
 
 Evalúe si los errores del modelo A son (aproximadamente) normales y si están centrados en 0. Para ello, utilice las funciones `hist()` y `residuals()`.
 
 ```{r}
-
+hist(residuals(modeloA))
 ```
 
 Estime un nuevo modelo A con dos predictores: `boredom` y `bullying`.
 
 ```{r}
-modeloA <- lm()
+modeloA <- lm(sadism ~ 1 + boredom + bullying, data = totals)
 ```
 
 Calcule nuevamente el PRE para comparar los errores del modelo C con el nuevo modelo A.
 
 ```{r}
-PRE <- 1 - sum()/sum()
+PRE <- 1 - sum(residuals(modeloA)^2)/sum(residuals(modeloC)^2)
 PRE
 ```
 
 Evalúe si los errores del nuevo modelo A son (aproximadamente) normales y si están centrados en 0.
 
 ```{r}
-
+hist(residuals(modeloA))
 ```
 
 Finalmente, muestre los coeficientes $\beta_0$, $\beta_1$ y $\beta_2$ del nuevo modelo A con la función `coef()`.
 
 ```{r}
-
+coef(modeloA)
 ```
