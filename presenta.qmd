@@ -252,7 +252,7 @@ También es posible crear tablas como la que aparece en la página 32 del libro,
 ```{r}
 Z <- seq(from = -3, to = 3, by = 0.1)
 probability <- pnorm(Z)
-cumulativeProbabilities <- round(cbind(Z, areas), 3)
+cumulativeProbabilities <- round(cbind(Z, probability), 3)
 ```
 
 ```{r}
