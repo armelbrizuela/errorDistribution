@@ -49,7 +49,7 @@ epsilon_i <- c(
   -5, -5, -28, 5, -19, 35, -24)
 ```
 
-Ahora vamos a genear una muestra aleatoria simple de esta población.
+Ahora vamos a generar una muestra aleatoria simple de esta población.
 
 ```{r}
 e_i <- sample(x = epsilon_i, size = 20, replace = TRUE)
